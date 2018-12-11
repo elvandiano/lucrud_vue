@@ -8,8 +8,11 @@
       <input v-else class="todo-item-edit" type="text" v-focus v-model="title" @blur="doneEdit"
              @keyup.enter="doneEdit" @keyup.esc="cancelEdit"/>
     </div>
-    <div class="remove-item" @click="removeTodo(index)">
-      &times;
+    <div>
+      <button @click="pluralize">Plural</button>
+      <span class="remove-item" @click="removeTodo(index)">
+        &times;
+      </span>
     </div>
   </div>
 </template>
@@ -57,9 +60,15 @@
         }
       }
     },
+    created() {
+      eventBus.$on('pluralize', this.handlePluralize)
+    },
+    beforeDestroy() {
+      eventBus.$off('pluralize', this.handlePluralize)
+    },
     methods: {
       removeTodo(index) {
-        this.$emit('removedTodo', index)
+        eventBus.$emit('removedTodo', index)
       },
       editTodo() {
         this.beforeEdit = this.title
@@ -70,7 +79,7 @@
           this.title = this.beforeEdit
         }
         this.edit = false
-        this.$emit('finishedEdit',{
+        eventBus.$emit('finishedEdit', {
           'index': this.index,
           'todo': {
             'id': this.id,
@@ -84,6 +93,21 @@
         this.edit = false;
         this.title = this.beforeEdit
       },
+      pluralize() {
+        eventBus.$emit('pluralize')
+      },
+      handlePluralize(){
+        this.title = 'Neo ' + this.title
+        eventBus.$emit('finishedEdit', {
+          'index': this.index,
+          'todo': {
+            'id': this.id,
+            'title': this.title,
+            'completed': this.completed,
+            'edit': this.edit
+          }
+        })
+      }
     }
   }
 </script>

@@ -2,24 +2,19 @@
   <div>
     <input type="text" class="todo-input" placeholder="what need to be done" v-model="newTodo" @keyup.enter="addTodo">
     <transition-group name="fade" enter-active-class="animated fadeInLeft" leave-active-class="animated fadeOutRight">
-    <todo-item v-for="(todo, index) in todosFiltered" :key="todo.id" :todo="todo" :index="index"
-               @removedTodo="removeTodo" @finishedEdit="finishedEdit" :checkAll="!anyRemaining">
-    </todo-item>
+      <todo-item v-for="(todo, index) in todosFiltered" :key="todo.id" :todo="todo" :index="index"
+                 :checkAll="!anyRemaining">
+      </todo-item>
     </transition-group>
     <div class="extra-container">
-      <div><label><input type="checkbox" :checked="!anyRemaining" @change="checkAllTodo"> check all </label></div>
-      <div v-if="remainActive === false">{{remaining}} items Active</div>
-      <div v-if="remainCompleted === false">{{remaining1}} items Completed</div>
+      <todo-item-check-all :anyRemaining="anyRemaining"/>
+      <todo-item-remaining :remain-active="remainActive" :remain-completed="remainCompleted" :remaining="remaining" :remaining1="remaining1"/>
     </div>
     <div class="extra-container">
-      <div>
-        <button :class="{active: filter === 'all'}" @click="filter = 'all'">All</button>
-        <button :class="{active: filter === 'active'}" @click="filter = 'active'">Active</button>
-        <button :class="{active: filter === 'completed'}" @click="filter = 'completed'">Completed</button>
-      </div>
+      <todo-filtered/>
       <div>
         <transition name="fade">
-          <button v-if="showClearCompletedButton" @click="clearCompleted">Delete</button>
+          <todo-delete-completed :showClearCompletedButton="showClearCompletedButton"/>
         </transition>
       </div>
     </div>
@@ -28,13 +23,20 @@
 </template>
 
 <script>
+  import TodoDeleteCompleted from './TodoDeleteCompleted'
+  import TodoFiltered from './TodoFiltered'
+  import TodoItemCheckAll from './TodoItemCheckAll'
+  import TodoItemRemaining from './TodoItemRemaining'
   import TodoItem from './TodoItem'
 
   export default {
-    components: {TodoItem},
     name: 'todo-list',
-    component: {
-      TodoItem
+    components: {
+      TodoDeleteCompleted,
+      TodoFiltered,
+      TodoItemRemaining,
+      TodoItem,
+      TodoItemCheckAll
     },
     data() {
       return {
@@ -43,7 +45,7 @@
         remainCompleted: false,
         idForTodo: 3,
         beforeEdit: '',
-        filter: 'all',
+        filter: '',
         todosSave: [],
         todos: [{
           'id': '1',
@@ -59,6 +61,20 @@
           }
         ]
       }
+    },
+    created() {
+      eventBus.$on('removedTodo', (index) => this.removeTodo(index))
+      eventBus.$on('finishedEdit', (data) => this.finishedEdit(data))
+      eventBus.$on('checkAllChange', (check) => this.checkAllTodo(check))
+      eventBus.$on('filterChange', (filter) => this.filter = filter)
+      eventBus.$on('deleteCompleted', (deleted) => this.clearCompleted(deleted))
+    },
+    beforeDestroy() {
+      eventBus.$off('removedTodo', (index) => this.removeTodo(index))
+      eventBus.$off('finishedEdit', (data) => this.finishedEdit(data))
+      eventBus.$off('checkAllChange', (check) => this.checkAllTodo(check))
+      eventBus.$off('filterChange', (filter) => this.filter = filter)
+      eventBus.$off('deleteCompleted', (deleted) => this.clearCompleted(deleted))
     },
     computed: {
       remaining() {
@@ -115,7 +131,7 @@
         this.todos = this.todos.filter(todo => !todo.completed)
       },
       finishedEdit(data) {
-        this.todos.splice(data.index, 1 , data.todo)
+        this.todos.splice(data.index, 1, data.todo)
       }
     }
   }
