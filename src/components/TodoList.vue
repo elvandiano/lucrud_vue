@@ -58,7 +58,7 @@
         //     'title': 'The King of Solomon',
         //     'completed': false,
         //     'edit': false
-        //   }
+        //   }/
         // ]
       }
     },

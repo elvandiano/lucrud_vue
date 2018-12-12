@@ -20,7 +20,7 @@ export const store = new Vuex.Store({
     }]
   },
   getters: {
-    // todo getters
+    // todo gettersss
   },
   mutations: {
     // todo mutation
