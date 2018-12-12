@@ -31,15 +31,17 @@
 </script>
 
 <style scoped>
-  .active{
+  .active {
     border-radius: 3px;
     padding: 0 6px 0 6px;
     background-color: #7ec3de;
   }
-  .notactive{
+
+  .notactive {
     border-radius: 3px;
     padding: 0 6px 0 6px;
     background-color: #b6deac;
   }
+
 
 </style>
