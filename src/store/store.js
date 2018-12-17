@@ -11,6 +11,8 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
   state: {
     filter: '',
+    remainActive: false,
+    remainCompleted: false,
     todos: [{
       'id': '1',
       'title': 'The War of Warrior',
@@ -35,16 +37,16 @@ export const store = new Vuex.Store({
     },
     todosFiltered(state) {
       if (state.filter == 'all') {
-        // this.remainActive = false;
-        // this.remainCompleted = false;
+        state.remainActive = false;
+        state.remainCompleted = false;
         return state.todos
       } else if (state.filter == 'active') {
-        // this.remainActive = false;
-        // this.remainCompleted = true;
+        state.remainActive = false;
+        state.remainCompleted = true;
         return state.todos.filter(todo => !todo.completed)
       } else if (state.filter == 'completed') {
-        // this.remainCompleted = false;
-        // this.remainActive = true;
+        state.remainCompleted = false;
+        state.remainActive = true;
         return state.todos.filter(todo => todo.completed)
       }
       return state.todos

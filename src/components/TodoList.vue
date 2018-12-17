@@ -43,8 +43,6 @@
     data() {
       return {
         newTodo: '',
-        remainActive: false,
-        remainCompleted: false,
         idForTodo: 3,
       }
     },

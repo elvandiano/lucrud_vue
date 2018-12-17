@@ -12,7 +12,6 @@
     computed: {
       filter() {
         return this.$store.state.filter
-
       }
     },
     methods: {

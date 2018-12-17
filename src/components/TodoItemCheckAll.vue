@@ -12,7 +12,7 @@
     },
     methods: {
       checkAllTodo() {
-        return this.$store.dispatch('checkAll', event,target.checked)
+        return this.$store.dispatch('checkAll', event.target.checked)
       }
     }
   }
