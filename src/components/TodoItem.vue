@@ -10,7 +10,7 @@
     </div>
     <div>
       <button @click="pluralize">Plural</button>
-      <span class="remove-item" @click="removeTodo(index)">
+      <span class="remove-item" @click="removeTodo(todo.id)">
         &times;
       </span>
     </div>
@@ -24,14 +24,6 @@
       todo: {
         type: Object,
         required: true
-      },
-      index: {
-        type: Number,
-        required: true
-      },
-      checkAll: {
-        type: Boolean,
-        required: true
       }
     },
     data() {
@@ -42,6 +34,12 @@
         'edit': this.todo.edit,
         'beforeEdit': ''
       }
+    },
+    created() {
+      eventBus.$on('pluralize', this.handlePluralize)
+    },
+    beforeDestroy() {
+      eventBus.$off('pluralize', this.handlePluralize)
     },
     watch: {
       checkAll() {
@@ -60,15 +58,9 @@
         }
       }
     },
-    created() {
-      eventBus.$on('pluralize', this.handlePluralize)
-    },
-    beforeDestroy() {
-      eventBus.$off('pluralize', this.handlePluralize)
-    },
     methods: {
-      removeTodo(index) {
-        eventBus.$emit('removedTodo', index)
+      removeTodo(id) {
+        this.$store.dispatch('deleteTodo', id)
       },
       editTodo() {
         this.beforeEdit = this.title
@@ -79,14 +71,12 @@
           this.title = this.beforeEdit
         }
         this.edit = false
-        eventBus.$emit('finishedEdit', {
-          'index': this.index,
-          'todo': {
-            'id': this.id,
-            'title': this.title,
-            'completed': this.completed,
-            'edit': this.edit
-          }
+
+        this.$store.dispatch('updateTodo', {
+          'id': this.id,
+          'title': this.title,
+          'completed': this.completed,
+          'edit': this.edit
         })
       },
       cancelEdit() {
@@ -96,17 +86,16 @@
       pluralize() {
         eventBus.$emit('pluralize')
       },
-      handlePluralize(){
+      handlePluralize() {
         this.title = 'Neo ' + this.title
-        eventBus.$emit('finishedEdit', {
-          'index': this.index,
-          'todo': {
+        const index = this.$store.state.todos.findIndex(item => item.id === this.id)
+        this.$store.state.todos.splice(index, 1,
+          {
             'id': this.id,
             'title': this.title,
             'completed': this.completed,
             'edit': this.edit
-          }
-        })
+          })
       }
     }
   }

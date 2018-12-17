@@ -5,16 +5,15 @@
 <script>
   export default {
     name: "todo-item-check-all",
-    props: {
-      anyRemaining: {
-        type: Boolean,
-        required: true
+    computed: {
+      anyRemaining() {
+        return this.$store.getters.anyRemaining
       }
     },
     methods: {
       checkAllTodo() {
-        eventBus.$emit('checkAllChange', this.anyRemaining)
-      },
+        return this.$store.dispatch('checkAll', event,target.checked)
+      }
     }
   }
 </script>

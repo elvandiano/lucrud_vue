@@ -2,27 +2,29 @@
   <div>
     <input type="text" class="todo-input" placeholder="what need to be done" v-model="newTodo" @keyup.enter="addTodo">
     <transition-group name="fade" enter-active-class="animated fadeInLeft" leave-active-class="animated fadeOutRight">
-      <todo-item v-for="(todo, index) in todosFiltered" :key="todo.id" :todo="todo" :index="index"
-                 :checkAll="!anyRemaining">
-      </todo-item>
+      <todo-item v-for="todo in todosFiltered" :key="todo.id" :todo="todo" :checkAll="!anyRemaining"/>
     </transition-group>
+
     <div class="extra-container">
-      <todo-item-check-all :anyRemaining="anyRemaining"/>
-      <todo-item-remaining :remain-active="remainActive" :remain-completed="remainCompleted" :remaining="remaining"
-                           :remaining1="remaining1"/>
+      <todo-item-check-all/>
+      <todo-item-remaining/>
     </div>
+
     <div class="extra-container">
       <todo-filtered/>
+
       <div>
         <transition name="fade">
-          <todo-delete-completed :showClearCompletedButton="showClearCompletedButton"/>
+          <todo-delete-completed/>
         </transition>
       </div>
     </div>
 
   </div>
 </template>
+
 <script>
+
   import TodoDeleteCompleted from './TodoDeleteCompleted'
   import TodoFiltered from './TodoFiltered'
   import TodoItemCheckAll from './TodoItemCheckAll'
@@ -44,66 +46,14 @@
         remainActive: false,
         remainCompleted: false,
         idForTodo: 3,
-        beforeEdit: '',
-        // filter: '',
-        todosSave: [],
-        // todos: [{
-        //   'id': '1',
-        //   'title': 'The War of Warrior',
-        //   'completed': false,
-        //   'edit': false
-        // },
-        //   {
-        //     'id': '2',
-        //     'title': 'The King of Solomon',
-        //     'completed': false,
-        //     'edit': false
-        //   }/
-        // ]
       }
     },
-    created() {
-      eventBus.$on('removedTodo', (index) => this.removeTodo(index))
-      eventBus.$on('finishedEdit', (data) => this.finishedEdit(data))
-      eventBus.$on('checkAllChange', (check) => this.checkAllTodo(check))
-      eventBus.$on('filterChange', (filter) => this.$store.state.filter = filter)
-      eventBus.$on('deleteCompleted', (deleted) => this.clearCompleted(deleted))
-    },
-    beforeDestroy() {
-      eventBus.$off('removedTodo', (index) => this.removeTodo(index))
-      eventBus.$off('finishedEdit', (data) => this.finishedEdit(data))
-      eventBus.$off('checkAllChange', (check) => this.checkAllTodo(check))
-      eventBus.$off('filterChange', (filter) => this.$store.state.filter = filter)
-      eventBus.$off('deleteCompleted', (deleted) => this.clearCompleted(deleted))
-    },
     computed: {
-      remaining() {
-        return this.$store.state.todos.filter(todo => !todo.completed).length
-      },
-      remaining1() {
-        return this.$store.state.todos.filter(todo => todo.completed).length
-      },
       anyRemaining() {
-        return this.remaining !== 0
+        return this.$store.getters.anyRemaining
       },
       todosFiltered() {
-        if (this.$store.state.filter === 'all') {
-          this.remainActive = false;
-          this.remainCompleted = false;
-          return this.$store.state.todos
-        } else if (this.$store.state.filter === 'active') {
-          this.remainActive = false;
-          this.remainCompleted = true;
-          return this.$store.state.todos.filter(todo => !todo.completed)
-        } else if (this.$store.state.filter === 'completed') {
-          this.remainCompleted = false;
-          this.remainActive = true;
-          return this.$store.state.todos.filter(todo => todo.completed)
-        }
-        return this.$store.state.todos
-      },
-      showClearCompletedButton() {
-        return this.$store.state.todos.filter(todo => todo.completed).length > 0
+        return this.$store.getters.todosFiltered
       }
     },
     methods: {
@@ -111,27 +61,14 @@
         if (this.newTodo.length == 0) {
           return
         }
-        this.$store.state.todos.push({
+
+        this.$store.dispatch('addTodo',{
           id: this.idForTodo,
-          title: this.newTodo,
-          completed: false,
-          edit: false
+          title: this.newTodo
         });
 
         this.newTodo = '';
         this.idForTodo++
-      },
-      removeTodo(index) {
-        this.$store.state.todos.splice(index, 1)
-      },
-      checkAllTodo() {
-        this.$store.state.todos.forEach((todo) => todo.completed = event.target.checked)
-      },
-      clearCompleted() {
-        this.$store.state.todos = this.$store.state.todos.filter(todo => !todo.completed)
-      },
-      finishedEdit(data) {
-        this.$store.state.todos.splice(data.index, 1, data.todo)
       }
     }
   }

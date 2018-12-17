@@ -1,31 +1,34 @@
 <template>
   <div>
-    <a class="active" v-if="remainActive === false">{{remaining}} items Active</a>
+    <a class="active" >{{remaining}} items Active</a>
     <a>&ensp;&ensp;</a>
-    <a class="notactive" v-if="remainCompleted === false">{{remaining1}} items Completed</a>
+    <a class="notactive" >{{remaining1}} items Completed</a>
   </div>
 </template>
 
 <script>
+
+  // v-if="remainActive === false" // v-if="remainCompleted === false"
   export default {
     name: "todo-item-remaining",
     props: {
-      remaining: {
-        type: Number,
-        required: true
+      // remainActive: {
+      //   type: Boolean,
+      //   required: true
+      // },
+      // remainCompleted: {
+      //   type: Boolean,
+      //   required: true
+      // }
+    },
+    computed: {
+      remaining() {
+        return this.$store.getters.remaining
       },
-      remaining1: {
-        type: Number,
-        required: true
+      remaining1() {
+        return this.$store.getters.remaining1
       },
-      remainActive: {
-        type: Boolean,
-        required: true
-      },
-      remainCompleted: {
-        type: Boolean,
-        required: true
-      }
+
     }
   }
 </script>
